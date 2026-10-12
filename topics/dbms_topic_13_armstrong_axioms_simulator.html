@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS Topic 13 — Armstrong's Axioms and Rules</title>
+<style>
+:root{--ink:#182338;--muted:#5e6a7e;--line:#dce3ed;--bg:#f4f7fb;--blue:#2459a6;--pale:#eaf2ff;--green:#137747;--greenbg:#e8f7ef;--red:#b42c36;--redbg:#fff0f1;--gold:#936100;--goldbg:#fff5dc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:1050px;margin:auto;padding:22px 16px 46px}header{background:linear-gradient(130deg,#16396f,#3478c8);color:#fff;border-radius:18px;padding:26px;margin-bottom:18px}h1{font-size:clamp(1.6rem,4vw,2.45rem);line-height:1.15;margin:0 0 8px}header p{margin:0;color:#e8f1ff}.pill{display:inline-block;border:1px solid #ffffff66;background:#ffffff20;padding:4px 10px;border-radius:30px;font-size:.82rem;margin-bottom:12px}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:19px;margin-bottom:16px;box-shadow:0 4px 18px #19355d08}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}h2{font-size:1.25rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px}.formula{background:var(--pale);border:1px solid #c9dcff;border-radius:10px;padding:12px;text-align:center;font-weight:750;font-size:1.2rem;margin:10px 0}.muted{color:var(--muted)}.tag{display:inline-block;padding:3px 8px;border-radius:7px;font-size:.82rem;font-weight:700}.yes{background:var(--greenbg);color:var(--green)}.no{background:var(--redbg);color:var(--red)}.gold{background:var(--goldbg);color:var(--gold)}button,select,input{font:inherit;padding:9px 11px;border:1px solid #bac7d8;border-radius:9px;background:white;color:var(--ink)}button{cursor:pointer;font-weight:650}button.primary{background:var(--blue);border-color:var(--blue);color:white}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.result{background:#f2f5fa;border-radius:10px;padding:12px;margin-top:10px;min-height:42px}.step{border-left:4px solid var(--blue);background:#f7faff;padding:10px 12px;border-radius:0 8px 8px 0;margin:9px 0}table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid var(--line);padding:9px;text-align:left}th{background:#eff4fa}.question{border:1px solid var(--line);border-radius:10px;padding:13px;margin:12px 0}.options{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:20px}
+</style></head>
+<body><div class="wrap">
+<header><span class="pill">DBMS • Topic 13</span><h1>Armstrong’s Axioms and Derived Rules</h1><p>Learn how to derive new functional dependencies from the ones you already know.</p></header>
+
+<section class="card"><h2>What are Armstrong’s axioms?</h2>
+<p>They are sound and complete inference rules for functional dependencies. In simple terms, they tell us which new dependencies logically follow from known dependencies.</p>
+<div class="formula">Given FDs → Apply a rule → Derive another FD</div>
+<p class="muted">The three basic axioms are Reflexivity, Augmentation, and Transitivity. Union, Decomposition, and Pseudotransitivity are commonly used derived rules.</p></section>
+
+<div class="grid">
+<section class="card"><h2>1. Reflexivity</h2><div class="formula">If Y ⊆ X, then X → Y</div><p>If the right-side attributes are already included on the left, the dependency must hold.</p><div class="step"><b>Example:</b> {StudentID, CourseID} → StudentID</div><span class="tag yes">Subset rule</span></section>
+<section class="card"><h2>2. Augmentation</h2><div class="formula">If X → Y, then XZ → YZ</div><p>Add the same attribute set Z to both sides of a valid FD.</p><div class="step"><b>Example:</b> A → B gives AC → BC.</div><span class="tag yes">Add the same attributes to both sides</span></section>
+<section class="card"><h2>3. Transitivity</h2><div class="formula">If X → Y and Y → Z, then X → Z</div><p>If X determines Y, and Y determines Z, then X determines Z.</p><div class="step"><b>Example:</b> StudentID → DeptID and DeptID → DeptName, so StudentID → DeptName.</div><span class="tag yes">Chain rule</span></section>
+<section class="card"><h2>4. Union</h2><div class="formula">If X → Y and X → Z, then X → YZ</div><p>Combine two dependencies with the same left side.</p><div class="step"><b>Example:</b> A → B and A → C give A → BC.</div><span class="tag yes">Combine right sides</span></section>
+<section class="card"><h2>5. Decomposition</h2><div class="formula">If X → YZ, then X → Y and X → Z</div><p>Split a dependency with multiple attributes on the right into separate dependencies.</p><div class="step"><b>Example:</b> A → BC gives A → B and A → C.</div><span class="tag yes">Split right sides</span></section>
+<section class="card"><h2>6. Pseudotransitivity</h2><div class="formula">If X → Y and WY → Z, then WX → Z</div><p>Use X to obtain Y; together with W, that gives WY, which determines Z.</p><div class="step"><b>Example:</b> A → B and CB → D, so CA → D.</div><span class="tag yes">Chain with extra attributes</span></section>
+</div>
+
+<section class="card"><h2>Interactive rule explorer</h2><p>Select a rule to see its pattern and a worked example.</p>
+<label for="rule"><b>Choose a rule:</b></label>
+<select id="rule" onchange="showRule()" style="width:100%;margin-top:7px">
+<option value="ref">Reflexivity</option><option value="aug">Augmentation</option><option value="trans">Transitivity</option><option value="union">Union</option><option value="decomp">Decomposition</option><option value="pseudo">Pseudotransitivity</option>
+</select>
+<div id="ruleBox" class="result" aria-live="polite"></div>
+<div class="controls"><button class="primary" onclick="showRule()">Show explanation</button></div></section>
+
+<section class="card"><h2>Practice: derive the result</h2>
+<div class="question"><b>Q1.</b> Given A → B and B → C, what follows?<div class="options"><button onclick="quiz(1,'a')">A → C</button><button onclick="quiz(1,'b')">C → A</button><button onclick="quiz(1,'c')">B → A</button></div><div id="q1" class="result" hidden></div></div>
+<div class="question"><b>Q2.</b> Given A → B and A → C, what can Union derive?<div class="options"><button onclick="quiz(2,'a')">A → BC</button><button onclick="quiz(2,'b')">BC → A</button><button onclick="quiz(2,'c')">B → C</button></div><div id="q2" class="result" hidden></div></div>
+<div class="question"><b>Q3.</b> Given A → BC, which dependencies follow by Decomposition?<div class="options"><button onclick="quiz(3,'a')">A → B and A → C</button><button onclick="quiz(3,'b')">B → A and C → A</button><button onclick="quiz(3,'c')">BC → A</button></div><div id="q3" class="result" hidden></div></div>
+<div class="question"><b>Q4.</b> Given A → B and CB → D, what follows by Pseudotransitivity?<div class="options"><button onclick="quiz(4,'a')">CA → D</button><button onclick="quiz(4,'b')">D → CA</button><button onclick="quiz(4,'c')">A → D</button></div><div id="q4" class="result" hidden></div></div>
+</section>
+
+<section class="card"><h2>Memory trick</h2>
+<table><thead><tr><th>Rule</th><th>Think of it as</th></tr></thead><tbody>
+<tr><td>Reflexivity</td><td>Take a subset</td></tr><tr><td>Augmentation</td><td>Add the same thing to both sides</td></tr><tr><td>Transitivity</td><td>Make a chain</td></tr><tr><td>Union</td><td>Combine right sides</td></tr><tr><td>Decomposition</td><td>Split right sides</td></tr><tr><td>Pseudotransitivity</td><td>Chain while carrying an extra attribute</td></tr></tbody></table>
+<p><b>Next topic:</b> Attribute Closure (X⁺) — finding every attribute determined by a set of attributes.</p></section>
+<div class="footer">Interactive DBMS learning file • Runs locally in your browser</div>
+</div>
+<script>
+const rules={
+ref:{pattern:'If Y ⊆ X, then X → Y',example:'{A, B} → A',why:'A is already included in {A, B}; therefore the dependency is guaranteed.'},
+aug:{pattern:'If X → Y, then XZ → YZ',example:'A → B gives AC → BC',why:'Adding C to both sides preserves the dependency.'},
+trans:{pattern:'If X → Y and Y → Z, then X → Z',example:'A → B; B → C; therefore A → C',why:'A determines B, and B determines C, so A determines C.'},
+union:{pattern:'If X → Y and X → Z, then X → YZ',example:'A → B; A → C; therefore A → BC',why:'The same determinant A determines both B and C.'},
+decomp:{pattern:'If X → YZ, then X → Y and X → Z',example:'A → BC gives A → B and A → C',why:'A determining a group of attributes means it determines each attribute in that group.'},
+pseudo:{pattern:'If X → Y and WY → Z, then WX → Z',example:'A → B; CB → D; therefore CA → D',why:'CA determines C and, by A → B, also B. So CA determines CB; CB determines D.'}
+};
+function showRule(){const r=rules[document.getElementById('rule').value];document.getElementById('ruleBox').innerHTML='<div class="formula">'+r.pattern+'</div><p><b>Worked example:</b> '+r.example+'</p><p>'+r.why+'</p>'}
+const answers={1:['a','Correct: this is Transitivity. A → B and B → C imply A → C.','Use Transitivity to connect A through B to C.'],2:['a','Correct: this is Union. Combine B and C on the right.','Union combines dependencies with the same left side: A → BC.'],3:['a','Correct: Decomposition splits the right side.','A → BC implies A → B and A → C.'],4:['a','Correct: this is Pseudotransitivity.','A → B and CB → D imply CA → D.']};
+function quiz(n,v){const a=answers[n],e=document.getElementById('q'+n);e.hidden=false;e.innerHTML=v===a[0]?'<span class="tag yes">'+a[1]+'</span>':'<span class="tag no">Not quite.</span> '+a[2]}
+showRule();
+</script></body></html>

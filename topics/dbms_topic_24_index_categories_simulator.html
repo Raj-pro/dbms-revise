@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS — Index Categories Simulator</title>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#182235;--muted:#5c687c;--blue:#2457c5;--line:#d9e1ee;--green:#16805d;--orange:#b96a00;--red:#b42332}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}header{background:linear-gradient(120deg,#173b83,#3974d8);color:#fff;padding:24px 18px}header>div,main{max-width:1050px;margin:auto}h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.25rem)}header p{margin:0;opacity:.94}main{padding:18px;display:grid;gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:18px;box-shadow:0 4px 16px #1b31500a}h2{margin:0 0 10px;font-size:1.25rem}h3{margin:0 0 6px;font-size:1rem}.muted{color:var(--muted)}.pill{display:inline-block;border-radius:999px;padding:3px 10px;background:#eaf0ff;color:#214aa5;font-size:.82rem;font-weight:700}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.card{border:1px solid var(--line);border-radius:12px;padding:13px}.card p{margin:5px 0 0;color:var(--muted);font-size:.94rem}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:12px 0}.controls label{font-weight:650}.controls select,.controls input{font:inherit;border:1px solid var(--line);border-radius:9px;background:white;padding:9px}button{font:inherit;border:0;border-radius:9px;background:var(--blue);color:white;font-weight:650;padding:10px 13px;cursor:pointer}button.secondary{background:#e8eef8;color:#243752}button:focus,select:focus,input:focus{outline:3px solid #9ebaff;outline-offset:2px}.status{padding:12px;border:1px solid var(--line);border-radius:10px;background:#f5f7fb;margin-top:10px}.status.good{background:#eaf8f1;border-color:#a8dfc6}.status.warn{background:#fff5e5;border-color:#f2d19b}table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.94rem}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--line);vertical-align:top}th{background:#f1f5fb}.blocks{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.record{padding:10px 12px;border:1px solid #9db5e5;border-radius:9px;background:#f0f5ff;min-width:78px;text-align:center}.record small{display:block;color:var(--muted)}.indexline{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.entry{border:1px solid #8abda8;background:#eef9f3;border-radius:8px;padding:8px 10px}.question{border:1px solid var(--line);border-radius:12px;padding:13px;margin:12px 0}.question p{font-weight:700;margin:0 0 8px}.question label{display:block;padding:5px 0}.feedback{font-weight:650;margin-top:7px}footer{text-align:center;color:var(--muted);padding:0 16px 25px;font-size:.9rem}
+</style></head>
+<body>
+<header><div><span class="pill">Original syllabus · Index Categories</span><h1>Database Index Categories</h1><p>Compare primary, clustering, and secondary indexes — plus dense and sparse indexes.</p></div></header>
+<main>
+<section class="panel"><h2>1. What is an index?</h2>
+<p>A database index is an extra data structure that helps the DBMS find rows faster. Think of a book index: it points you toward the page rather than making you read every page.</p>
+<div class="grid">
+<div class="card"><h3>Benefit</h3><p>Faster searches and often faster sorting or joins.</p></div>
+<div class="card"><h3>Cost</h3><p>Extra storage and additional work when rows are inserted, updated, or deleted.</p></div>
+<div class="card"><h3>Important</h3><p>An index usually stores search-key values and pointers/references to records or blocks.</p></div>
+</div></section>
+<section class="panel"><h2>2. Explore index type by role</h2>
+<div class="controls"><label for="kind">Choose index category:</label><select id="kind">
+<option value="primary">Primary index</option><option value="clustering">Clustering index</option><option value="secondary">Secondary index</option></select></div>
+<div class="grid">
+<div class="card"><h3 id="kindTitle">Primary index</h3><p id="kindDef"></p></div>
+<div class="card"><h3>Typical use</h3><p id="kindUse"></p></div>
+<div class="card"><h3>Remember</h3><p id="kindRemember"></p></div>
+</div>
+<div class="status" id="kindStatus"></div>
+<table><thead><tr><th>Category</th><th>Search field</th><th>Classic textbook assumption</th></tr></thead><tbody>
+<tr><td><b>Primary index</b></td><td>Ordering key of the data file, usually a primary key</td><td>Data file is physically ordered by that key; often sparse.</td></tr>
+<tr><td><b>Clustering index</b></td><td>Ordering field that may have duplicate values</td><td>Records with the same field value are stored together; often one index entry per distinct value/group.</td></tr>
+<tr><td><b>Secondary index</b></td><td>Non-ordering field</td><td>Provides an additional access path; commonly dense.</td></tr>
+</tbody></table>
+<p class="muted">Terminology can vary between textbooks and DBMS implementations. For exams, follow the definitions used in your course notes.</p>
+</section>
+<section class="panel"><h2>3. Dense vs. sparse index</h2>
+<p>A <b>dense index</b> has an index entry for every search-key value or record (depending on the design). A <b>sparse index</b> has entries for only some values, commonly one per data block, and generally relies on the data being ordered.</p>
+<div class="controls"><label for="density">Choose:</label><select id="density"><option value="dense">Dense index</option><option value="sparse">Sparse index</option></select><button id="nextEntry">Show next index entry</button><button class="secondary" id="resetEntries">Reset</button></div>
+<h3>Sorted data records (Employee ID)</h3><div class="blocks" id="records"></div>
+<h3>Index entries</h3><div class="indexline" id="entries"></div>
+<div class="status" id="densityExplain" aria-live="polite"></div>
+</section>
+<section class="panel"><h2>4. Clustered vs. non-clustered (conceptual)</h2>
+<div class="grid">
+<div class="card"><h3>Clustered index</h3><p>Rows are stored in an order related to the index key. This can make range scans efficient. A table can have only one physical row order.</p></div>
+<div class="card"><h3>Non-clustered index</h3><p>The index is separate from the table's physical row arrangement and points to rows. Multiple non-clustered indexes may exist.</p></div>
+</div>
+<div class="status warn">Do not automatically treat “primary/secondary” and “clustered/non-clustered” as identical pairs. They describe different aspects, and exact terminology depends on the DBMS/textbook.</div>
+</section>
+<section class="panel"><h2>5. Quick quiz</h2>
+<div class="question"><p>1. Which index is built on a field that does not determine the physical ordering of the data file?</p><label><input type="radio" name="q1" value="a"> Primary index</label><label><input type="radio" name="q1" value="b"> Secondary index</label><label><input type="radio" name="q1" value="c"> Sparse index only</label><div class="feedback" id="f1"></div></div>
+<div class="question"><p>2. Which index generally contains more entries?</p><label><input type="radio" name="q2" value="a"> Dense index</label><label><input type="radio" name="q2" value="b"> Sparse index</label><label><input type="radio" name="q2" value="c"> Always the same</label><div class="feedback" id="f2"></div></div>
+<div class="question"><p>3. Why can a sparse index work well with an ordered data file?</p><label><input type="radio" name="q3" value="a"> It stores every row twice</label><label><input type="radio" name="q3" value="b"> The DBMS can use an index entry to find a nearby block and then scan within it</label><label><input type="radio" name="q3" value="c"> It does not need search keys</label><div class="feedback" id="f3"></div></div>
+<button id="check">Check answers</button> <button class="secondary" id="resetQuiz">Reset quiz</button><div class="status" id="score">Answer the questions and check your score.</div>
+</section>
+<section class="panel"><h2>Exam recap</h2><ul><li><b>Primary:</b> on the file's ordering key.</li><li><b>Clustering:</b> on an ordering field that can have repeated values.</li><li><b>Secondary:</b> on a field that is not the physical ordering field.</li><li><b>Dense:</b> entry for every search-key value/record, according to the index design.</li><li><b>Sparse:</b> entries for only selected values/blocks; typically requires ordered data.</li><li><b>Trade-off:</b> indexes speed up reads but consume storage and add write-maintenance overhead.</li></ul></section>
+</main><footer>DBMS interactive learning · Original syllabus sequence</footer>
+<script>
+const kinds={
+primary:{title:'Primary index',def:'Built on the ordering field of the data file, typically the primary key. Values are unique in the classic definition.',use:'Find records quickly by the key that determines file order.',remember:'Often sparse in the classic ordered-file model: one entry may point to each data block.',status:'Example: employee records physically sorted by unique EmployeeID, with index entries directing the search to blocks.'},
+clustering:{title:'Clustering index',def:'Built on the ordering field when that field is not unique. Records sharing a value are stored together.',use:'Find a group of rows sharing a value, such as all employees in one department.',remember:'A classic clustering index can have one entry per distinct field value/group.',status:'Example: records ordered by DepartmentID; one index entry can point to the first block for each department group.'},
+secondary:{title:'Secondary index',def:'Built on a field that does not define the physical ordering of the data file.',use:'Offer another route to find rows, such as looking up employees by last name.',remember:'Often dense; duplicate values may map to a list or bucket of record pointers.',status:'Example: records are ordered by EmployeeID, but a separate index on LastName helps search names.'}
+};
+function updateKind(){let d=kinds[document.getElementById('kind').value];for(let [id,key] of [['kindTitle','title'],['kindDef','def'],['kindUse','use'],['kindRemember','remember'],['kindStatus','status']])document.getElementById(id).textContent=d[key];}
+document.getElementById('kind').addEventListener('change',updateKind);updateKind();
+const data=[101,104,109,113,118,122,127,130,135,141,146,152];let visible=0;
+function renderEntries(){const dense=document.getElementById('density').value==='dense';document.getElementById('records').innerHTML=data.map((n,i)=>`<div class="record">ID ${n}<small>Block ${Math.floor(i/3)+1}</small></div>`).join('');let selected=dense?data.slice(0,visible):[101,113,127,141].slice(0,visible);document.getElementById('entries').innerHTML=selected.map((n)=>`<div class="entry">${n} → block ${Math.floor(data.indexOf(n)/3)+1}</div>`).join('')||'<span class="muted">Press “Show next index entry” to reveal entries.</span>';document.getElementById('densityExplain').textContent=dense?'Dense mode: an entry is shown for each record in this simplified unique-key example. More entries can make lookups direct, but require more index space.': 'Sparse mode: entries are shown for selected block-leading keys. Since records are sorted, the DBMS can locate the appropriate block and scan within it.';}
+document.getElementById('density').addEventListener('change',()=>{visible=0;renderEntries()});document.getElementById('nextEntry').addEventListener('click',()=>{let max=document.getElementById('density').value==='dense'?data.length:4;visible=Math.min(max,visible+1);renderEntries()});document.getElementById('resetEntries').addEventListener('click',()=>{visible=0;renderEntries()});renderEntries();
+const answers={q1:'b',q2:'a',q3:'b'};
+document.getElementById('check').addEventListener('click',()=>{let score=0;for(let i=1;i<=3;i++){let q='q'+i,s=document.querySelector('input[name="'+q+'"]:checked'),f=document.getElementById('f'+i);if(!s){f.textContent='Choose an answer first.';f.style.color='#b96a00'}else if(s.value===answers[q]){score++;f.textContent='Correct!';f.style.color='#16805d'}else{f.textContent='Not quite. Review the explanation above.';f.style.color='#b42332'}}document.getElementById('score').textContent='Score: '+score+'/3 correct.'});
+document.getElementById('resetQuiz').addEventListener('click',()=>{document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);document.querySelectorAll('.feedback').forEach(x=>x.textContent='');document.getElementById('score').textContent='Answer the questions and check your score.'});
+</script></body></html>

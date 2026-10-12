@@ -1,0 +1,304 @@
+# DBMS Complete Topic List
+
+## 1. RDBMS Fundamentals
+
+1. Relational Schema
+2. Data Types
+
+## 2. Keys in DBMS
+
+1. Candidate Key
+   - Simple Candidate Key
+   - Composite Candidate Key
+2. Primary Key
+3. Alternate Key
+4. Prime Attribute
+5. Non-Prime Attribute
+6. Super Key
+7. Foreign Key
+
+## 3. Referential Integrity Constraints
+
+1. Referenced Relation
+   - Insertion
+   - Deletion
+     - ON DELETE NO ACTION
+     - ON DELETE CASCADE
+     - ON DELETE SET NULL
+   - Updation
+2. Referencing Relation
+   - Insertion
+   - Deletion
+   - Updation
+
+## 4. Normalization
+
+1\. Database Anomalies
+
+- Insertion Anomaly
+- Deletion Anomaly
+- Updation Anomaly
+
+## 5. Functional Dependency (FD)
+
+1. Trivial Functional Dependency
+2. Non-Trivial Functional Dependency
+3. Semi-Non-Trivial Functional Dependency
+
+## 6. Armstrong's Axioms and Rules of Functional Dependencies
+
+1. Reflexivity Rule
+2. Union Rule
+3. Transitivity Rule
+4. Decomposition Rule
+5. Augmentation Rule
+6. Pseudotransitivity Rule
+
+## 7. Attribute Closure
+
+1\. Attribute Closure \\((X^+)\\)
+
+## 8. Functional Dependency Set Properties
+
+1. Equality of Functional Dependency Sets
+2. Canonical Cover / Minimal Cover
+
+## 9. Properties of Decomposition
+
+1. Lossless-Join Decomposition
+2. Dependency-Preserving Decomposition
+
+## 10. Normal Forms
+
+1. First Normal Form (1NF)
+2. Second Normal Form (2NF)
+3. Third Normal Form (3NF)
+4. Boyce–Codd Normal Form (BCNF)
+5. Fourth Normal Form (4NF)
+6. Fifth Normal Form (5NF)
+7. Sixth Normal Form (6NF)
+
+8\. Decomposition into Higher Normal Forms
+
+## 11. Queries and Query Languages
+
+1. Procedural Query Language
+2. Non-Procedural Query Language
+
+## 12. Relational Algebra
+
+### 12.1 Basic Operators
+
+1. Projection \\((\pi)\\)
+2. Selection \\((\sigma)\\)
+3. Rename \\((\rho)\\)
+4. Cartesian Product \\((\times)\\)
+5. Union \\((\cup)\\)
+6. Set Difference \\((-)\\)
+
+### 12.2 Derived Operators
+
+7. Intersection \\((\cap)\\)
+8. Join \\((\bowtie)\\)
+9. Division \\((\div)\\)
+
+### 12.3 Types of Joins
+
+1. Natural Join
+2. Conditional Join (Theta Join)
+3. Outer Join
+   - Left Outer Join
+   - Right Outer Join
+   - Full Outer Join
+
+## 13. Relational Calculus
+
+1. Tuple Relational Calculus (TRC)
+2. Domain Relational Calculus (DRC)
+3. Free Tuple Variables
+4. Bound Tuple Variables
+5. Unsafe Queries
+
+## 14. SQL
+
+1. Nested Queries
+2. SQL Clauses
+3. Relational Calculus and SQL Query Relationships
+
+## 15. ER Model (Entity–Relationship Model)
+
+1. Entity Set
+2. Attributes
+3. Main Components of the ER Model
+4. Relationships
+5. Cardinality Constraints
+   - One-to-One (1:1)
+   - One-to-Many (1:M)
+   - Many-to-One (M:1)
+   - Many-to-Many (M:N)
+6. Participation Constraints
+   - Total Participation
+   - Partial Participation
+7. Mapping ER Diagrams to Relational Schemas
+8. Weak Entities and Identifying Relationships
+
+## 16. Constraints for Relationship Sets
+
+1. Relationship Participation
+2. Relationship Mapping
+   - One-to-Many (1:M)
+   - Many-to-Many (M:N)
+   - One-to-One (1:1)
+3. Designing a Relational Database Management System (RDBMS) Schema from a Given ER Diagram
+4. Weak Entity Sets
+5. Referential Relationships
+   - Each Supervisor Supervises Many Subordinates
+   - Each Subordinate Has One Supervisor
+   - Each Supervisor Can Supervise One Subordinate
+   - Each Supervisor Can Supervise Many Subordinates
+
+## 17. File Organization and Indexing
+
+1\. File Organization and Its Types
+
+- Records in Database Files
+- Fixed-Length Records
+- Variable-Length Records
+- Record Organization in Database Files
+- Unspanned Organization
+- Spanned Organization
+
+2\. Indexing
+
+- Indexes on Records
+- Indexing by Ordered Fields
+- Indexing by Using Unordered Fields
+
+## 18. Categories of Index
+
+1. Dense Index
+2. Sparse Index
+3. Types of Indexing
+   - Ordered Index
+   - Key Index
+     - Primary Index
+     - Clustering Index
+   - Secondary Index
+     - Key Secondary Index
+     - Non-Key Secondary Index
+4. Dynamic Multilevel Indexing
+
+## 19. B-Tree and B+ Tree
+
+### 19.1 B-Tree
+
+1. Node Structure
+2. Root Node
+3. Internal Nodes
+4. Leaf Nodes
+5. Searching in a B-Tree
+6. Insertion and Deletion in a B-Tree
+
+### 19.2 B+ Tree
+
+1. Node Structure
+2. Root Node
+3. Internal Nodes
+4. Leaf Nodes
+5. Search Operations
+6. Insertion and Deletion
+7. Difference Between B-Tree and B+ Tree
+
+## 20. Join Algorithms
+
+1. Nested Loop Join
+2. Block Nested Loop Join
+3. Main Memory and Buffer Management
+4. Join Order Optimization
+   - \\(R \bowtie S\\)
+   - \\(S \bowtie R\\)
+
+## 21. Transactions
+
+1\. Main Operations Used in Transactions
+
+- Read \\((R)\\)
+- Write \\((W)\\)
+
+## 22. ACID Properties
+
+1. Atomicity
+2. Consistency
+3. Isolation
+4. Durability
+
+## 23. Transaction Logs and Recovery Basics
+
+1. Rollback
+2. Transaction Log
+3. Dirty Read
+4. Transaction State
+5. Transaction Consistency and Serializability
+6. System Crash Recovery
+7. RAID
+8. Transaction Failure
+
+## 24. Schedules
+
+1. Serializable Schedules
+2. Conflict Serializable Schedules
+3. View Serializable Schedules
+4. Conflict-Equivalent Schedules
+5. View-Equivalent Schedules
+6. Conflict Serializability
+7. View Serializability
+8. Serial Schedules
+9. Non-Serial Schedules
+10. Conflict and View Serializability Tests
+
+## 25. Conflict Serializability
+
+1. Conflict Serializability Schedule
+2. Precedence Graph / Serialization Graph
+3. Cycle Detection in the Precedence Graph
+4. Testing Whether a Schedule Is Conflict Serializable
+
+## 26. View Serializability
+
+1. View-Equivalent Schedules
+2. Conditions for View Equivalence
+3. Initial Reads
+4. Reads-from Relationships
+5. Final Writes
+6. Testing View Serializability
+
+## 27. Recoverability Classification
+
+1. Irrecoverable Schedules
+2. Recoverable Schedules
+3. Cascading Rollback
+4. Cascadeless Schedules
+5. Strict Schedules
+6. Lost Update Problem
+
+## 28. Concurrency Control Protocols
+
+### 28.1 Locking Protocols
+
+1. Locking Protocol
+2. Binary Locking
+3. Two-Phase Locking Protocol (2PL)
+   - Growing Phase
+   - Shrinking Phase
+   - Limitations of 2PL
+4. Strict Two-Phase Locking Protocol
+
+### 28.2 Timestamp Ordering Protocols
+
+1. Timestamp Ordering Protocol
+2. Basic Timestamp Ordering Protocol
+   - Transaction \\(T\\) Issues \\(R(X)\\)
+   - Transaction \\(T\\) Issues \\(W(X)\\)
+3. Thomas Write Rule / Thomas Write Timestamp Ordering Protocol
+   - Transaction \\(T\\) Issues \\(R(X)\\)
+   - Transaction \\(T\\) Issues \\(W(X)\\)

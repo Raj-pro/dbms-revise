@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS — Relationship-Set Constraints Simulator</title>
+<style>
+:root{--bg:#f4f7fb;--panel:#fff;--ink:#182235;--muted:#5c687c;--blue:#2457c5;--line:#d9e1ee;--green:#16805d;--orange:#b96a00;--red:#b42332}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(120deg,#173b83,#3974d8);color:#fff;padding:26px 18px}header .wrap,main{max-width:1050px;margin:auto}h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.35rem)}header p{margin:0;opacity:.93}
+main{padding:18px;display:grid;gap:16px}.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 4px 16px #1b31500a}
+h2{font-size:1.25rem;margin:0 0 10px}h3{font-size:1.03rem;margin:0 0 7px}.muted{color:var(--muted)}.pill{display:inline-block;background:#eaf0ff;color:#214aa5;border-radius:999px;padding:3px 10px;font-size:.82rem;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.choice{border:1px solid var(--line);border-radius:12px;padding:13px}.choice p{margin:6px 0 0;color:var(--muted);font-size:.93rem}
+button,select{font:inherit}button{border:0;border-radius:9px;padding:10px 13px;background:var(--blue);color:white;font-weight:650;cursor:pointer}button.secondary{background:#e8eef8;color:#243752}button:focus,select:focus{outline:3px solid #9ebaff;outline-offset:2px}
+.controls{display:flex;flex-wrap:wrap;gap:9px;align-items:center;margin:10px 0}.controls label{font-weight:650}.controls select{padding:9px;border:1px solid var(--line);border-radius:9px;background:white}
+.diagram{display:grid;grid-template-columns:1fr minmax(130px,.8fr) 1fr;gap:12px;align-items:center;margin:14px 0}
+.entity{border:2px solid #6790dc;border-radius:12px;padding:14px;text-align:center;background:#f2f6ff}.entity strong{display:block;font-size:1.05rem}.entity small{color:var(--muted)}
+.relationship{border:2px dashed #9baac1;background:#f8faff;border-radius:10px;padding:12px;text-align:center;font-weight:750}
+.edge{font-size:.85rem;color:var(--muted);margin-top:5px}.status{border-radius:10px;padding:12px;background:#f2f5fa;border:1px solid var(--line);margin-top:10px}.status.good{background:#eaf8f1;border-color:#a8dfc6}.status.warn{background:#fff5e5;border-color:#f2d19b}.status.bad{background:#fff0f1;border-color:#f2b8be}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.94rem}th,td{text-align:left;border-bottom:1px solid var(--line);padding:9px;vertical-align:top}th{background:#f1f5fb}
+.question{padding:13px;border:1px solid var(--line);border-radius:12px;margin:12px 0}.question p{font-weight:700;margin:0 0 8px}.question label{display:block;padding:5px 0}.feedback{margin-top:8px;font-weight:650}
+footer{text-align:center;padding:5px 18px 25px;color:var(--muted);font-size:.9rem}
+@media(max-width:560px){.diagram{grid-template-columns:1fr}.relationship{order:0}.entity{order:1}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="pill">Original syllabus · Section 16</span>
+  <h1>Relationship-Set Constraints</h1>
+  <p>Learn cardinality ratios, participation constraints, and how to read them in an ER model.</p>
+</div></header>
+<main>
+<section class="panel">
+<h2>1. The core idea</h2>
+<p>An <b>entity</b> is a thing (such as Student or Course). A <b>relationship</b> connects entities (such as Student <i>enrolls in</i> Course). Relationship-set constraints tell us <b>how many entities can be connected</b> and whether participation is compulsory.</p>
+<div class="grid">
+<div class="choice"><h3>Cardinality ratio</h3><p>How many entities on one side can be associated with an entity on the other side?</p></div>
+<div class="choice"><h3>Participation constraint</h3><p>Must every entity take part in the relationship, or is participation optional?</p></div>
+</div>
+</section>
+
+<section class="panel">
+<h2>2. Explore cardinality ratios</h2>
+<p class="muted">Choose a relationship to see what it permits.</p>
+<div class="controls">
+<label for="ratio">Relationship:</label>
+<select id="ratio">
+<option value="1:1">Person — has — Passport (1:1)</option>
+<option value="1:N" selected>Department — employs — Employee (1:N)</option>
+<option value="N:1">Employee — works for — Department (N:1)</option>
+<option value="M:N">Student — takes — Course (M:N)</option>
+</select>
+</div>
+<div class="diagram" aria-live="polite">
+<div class="entity"><strong id="leftName">Department</strong><small id="leftDesc">One department</small></div>
+<div class="relationship"><span id="relName">employs</span><div class="edge" id="edgeLabel">1 : N</div></div>
+<div class="entity"><strong id="rightName">Employee</strong><small id="rightDesc">Many employees</small></div>
+</div>
+<div class="status" id="ratioExplain"></div>
+<table>
+<thead><tr><th>Ratio</th><th>Meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><b>1:1</b></td><td>Each entity on either side is related to at most one entity on the other side.</td><td>Person ↔ Passport (simplified model)</td></tr>
+<tr><td><b>1:N</b></td><td>One entity on the left can relate to many on the right; each right-side entity relates to at most one left-side entity.</td><td>Department → Employees</td></tr>
+<tr><td><b>N:1</b></td><td>Many left-side entities can relate to one right-side entity.</td><td>Many employees → one department</td></tr>
+<tr><td><b>M:N</b></td><td>Many entities on either side can relate to many on the other side.</td><td>Students ↔ Courses</td></tr>
+</tbody></table>
+</section>
+
+<section class="panel">
+<h2>3. Explore participation</h2>
+<p>Participation asks a different question from cardinality: <b>must every entity participate?</b></p>
+<div class="controls">
+<label for="participation">Department–Employee participation:</label>
+<select id="participation">
+<option value="partial" selected>Partial on both sides</option>
+<option value="leftTotal">Total: every department must have employees</option>
+<option value="rightTotal">Total: every employee must belong to a department</option>
+<option value="bothTotal">Total on both sides</option>
+</select>
+</div>
+<div class="grid">
+<div class="choice"><h3>Department</h3><div id="deptPart" class="status">Partial participation</div><p id="deptExample">A department may currently have no employees.</p></div>
+<div class="choice"><h3>Employee</h3><div id="empPart" class="status">Partial participation</div><p id="empExample">An employee may be unassigned in this simplified model.</p></div>
+</div>
+<p class="muted"><b>Total participation</b> is commonly shown with a double line in an ER diagram. <b>Partial participation</b> is shown with a single line.</p>
+</section>
+
+<section class="panel">
+<h2>4. Quick check</h2>
+<div class="question" data-answer="b">
+<p>1. In a 1:N relationship, what does N mean?</p>
+<label><input type="radio" name="q1" value="a"> Every entity on both sides must participate.</label>
+<label><input type="radio" name="q1" value="b"> One entity on the 1-side can be related to many entities on the N-side.</label>
+<label><input type="radio" name="q1" value="c"> The relationship has no constraints.</label>
+<div class="feedback" id="f1"></div>
+</div>
+<div class="question" data-answer="c">
+<p>2. What does total participation mean?</p>
+<label><input type="radio" name="q2" value="a"> One entity can connect to many entities.</label>
+<label><input type="radio" name="q2" value="b"> Every entity participates in at most one relationship.</label>
+<label><input type="radio" name="q2" value="c"> Every entity in the specified entity set must participate in the relationship.</label>
+<div class="feedback" id="f2"></div>
+</div>
+<div class="question" data-answer="a">
+<p>3. Students can take many courses, and each course can have many students. Which ratio fits?</p>
+<label><input type="radio" name="q3" value="a"> M:N</label>
+<label><input type="radio" name="q3" value="b"> 1:1</label>
+<label><input type="radio" name="q3" value="c"> 1:N only</label>
+<div class="feedback" id="f3"></div>
+</div>
+<button id="checkQuiz">Check answers</button> <button class="secondary" id="resetQuiz">Reset quiz</button>
+<div class="status" id="score" aria-live="polite">Answer all three questions, then check your answers.</div>
+</section>
+
+<section class="panel">
+<h2>5. Remember the difference</h2>
+<ul>
+<li><b>Cardinality:</b> how many can be associated? (1:1, 1:N, N:1, M:N)</li>
+<li><b>Participation:</b> must every entity participate? (total or partial)</li>
+<li>These are independent ideas. A relationship can be 1:N and still have partial participation on one or both sides.</li>
+<li>In a relational database, a 1:N relationship is commonly implemented by placing a foreign key on the N-side. An M:N relationship is commonly implemented with a separate junction table.</li>
+</ul>
+</section>
+</main>
+<footer>DBMS learning simulator · Original syllabus sequence restored</footer>
+<script>
+const ratioData={
+"1:1":{l:"Person",r:"Passport",rel:"has",ld:"One person",rd:"One passport",ex:"Each person has at most one passport, and each passport belongs to at most one person in this simplified example."},
+"1:N":{l:"Department",r:"Employee",rel:"employs",ld:"One department",rd:"Many employees",ex:"One department may employ many employees, while each employee is associated with at most one department."},
+"N:1":{l:"Employee",r:"Department",rel:"works for",ld:"Many employees",rd:"One department",ex:"Many employees can work for the same department. In this direction, many employees point to one department."},
+"M:N":{l:"Student",r:"Course",rel:"takes",ld:"Many students",rd:"Many courses",ex:"A student can take many courses, and a course can have many students. A junction table is usually used in the relational design."}
+};
+const ratio=document.getElementById('ratio');
+function updateRatio(){const d=ratioData[ratio.value];document.getElementById('leftName').textContent=d.l;document.getElementById('rightName').textContent=d.r;document.getElementById('relName').textContent=d.rel;document.getElementById('leftDesc').textContent=d.ld;document.getElementById('rightDesc').textContent=d.rd;document.getElementById('edgeLabel').textContent=ratio.value;document.getElementById('ratioExplain').textContent=d.ex}
+ratio.addEventListener('change',updateRatio);updateRatio();
+const participation=document.getElementById('participation');
+function updateParticipation(){
+ const v=participation.value;
+ const deptTotal=v==='leftTotal'||v==='bothTotal';
+ const empTotal=v==='rightTotal'||v==='bothTotal';
+ const dept=document.getElementById('deptPart'),emp=document.getElementById('empPart');
+ dept.textContent=deptTotal?'Total participation':'Partial participation';dept.className='status '+(deptTotal?'good':'warn');
+ emp.textContent=empTotal?'Total participation':'Partial participation';emp.className='status '+(empTotal?'good':'warn');
+ document.getElementById('deptExample').textContent=deptTotal?'Every department must be connected to at least one employee.':'A department may have no employees in this model.';
+ document.getElementById('empExample').textContent=empTotal?'Every employee must be connected to a department.':'An employee may be unassigned in this model.';
+}
+participation.addEventListener('change',updateParticipation);updateParticipation();
+document.getElementById('checkQuiz').addEventListener('click',()=>{
+ let correct=0;
+ for(let i=1;i<=3;i++){const selected=document.querySelector('input[name="q'+i+'"]:checked');const fb=document.getElementById('f'+i);if(!selected){fb.textContent='Choose an answer first.';fb.style.color='#b96a00';continue;}if(selected.value===document.querySelectorAll('.question')[i-1].dataset.answer){correct++;fb.textContent='Correct!';fb.style.color='#16805d';}else{fb.textContent='Not quite — review the explanation above and try again.';fb.style.color='#b42332';}}
+ document.getElementById('score').textContent='Score: '+correct+'/3 correct.';
+});
+document.getElementById('resetQuiz').addEventListener('click',()=>{document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);document.querySelectorAll('.feedback').forEach(x=>{x.textContent='';});document.getElementById('score').textContent='Answer all three questions, then check your answers.';});
+</script>
+</body>
+</html>

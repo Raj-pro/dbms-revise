@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Topic 22 — ER Model Simulator</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#5b667a;--accent:#315ee8;--line:#dce3ef;--good:#16794b;--bad:#b42318;--soft:#eaf0ff}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(125deg,#14213d,#315ee8);color:white;padding:30px 20px}header .wrap,main{max-width:1080px;margin:auto}h1{margin:0 0 6px;font-size:clamp(1.7rem,4vw,2.5rem)}header p{margin:0;color:#e2eaff}
+main{padding:22px 16px 50px}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 18px;box-shadow:0 4px 18px #18294b0a}
+h2{font-size:1.35rem;margin:0 0 12px}h3{font-size:1.05rem;margin:12px 0 5px}.muted{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pill{display:inline-block;background:var(--soft);color:#2347b8;padding:3px 9px;border-radius:99px;font-size:.86rem;font-weight:650}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.95rem}th,td{border:1px solid var(--line);padding:9px;text-align:left}th{background:#f0f4fb}
+.entity{border:2px solid #315ee8;border-radius:9px;text-align:center;padding:12px;background:#eef3ff;font-weight:750;min-width:140px}
+.diamond{width:110px;height:70px;border:2px solid #16815a;transform:rotate(45deg);display:flex;align-items:center;justify-content:center;margin:20px auto;background:#e9fff5}
+.diamond span{transform:rotate(-45deg);font-weight:700;color:#116442}
+.diagram{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;padding:12px 0}
+.line{height:2px;width:38px;background:#7a879b}
+label{display:block;font-weight:650;margin:8px 0 4px}select,button{font:inherit;border-radius:9px;padding:9px 12px;border:1px solid #cbd5e1;background:white;color:var(--ink)}button{cursor:pointer;background:var(--accent);color:white;border-color:var(--accent);font-weight:650}button.secondary{background:white;color:var(--ink);border-color:var(--line)}button:hover{filter:brightness(.96)}.result{padding:12px;border-radius:10px;background:#f0f4fb;margin-top:12px}.good{color:var(--good);font-weight:700}.bad{color:var(--bad);font-weight:700}.answer{display:none;margin-top:8px;padding:10px;background:#f0fdf4;border-radius:8px}.code{background:#101828;color:#e6edf7;border-radius:10px;padding:14px;overflow:auto;font-family:ui-monospace,monospace;font-size:.92rem;white-space:pre-wrap}.quiz-q{padding:13px 0;border-bottom:1px solid var(--line)}.quiz-q:last-child{border:0}.feedback{font-weight:700;margin-top:6px}.small{font-size:.9rem}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="pill">DBMS · Topic 22</span><h1>ER Model (Entity–Relationship Model)</h1><p>Learn entities, attributes, relationships, cardinality, participation, weak entities, and mapping ER diagrams into tables.</p></div></header>
+<main>
+<section class="panel">
+<h2>1. What is an ER model?</h2>
+<p>An <b>ER model</b> is a plan or blueprint of a database. It shows <b>what things</b> we store and <b>how those things are connected</b>, before we create actual tables.</p>
+<div class="grid">
+<div><h3>Entity</h3><p>A real-world object or concept we want to store.</p><span class="pill">Examples: Student, Course, Employee</span></div>
+<div><h3>Attribute</h3><p>A property that describes an entity.</p><span class="pill">Student: ID, Name, Age</span></div>
+<div><h3>Relationship</h3><p>An association between entities.</p><span class="pill">Student <i>enrolls in</i> Course</span></div>
+</div>
+<div class="diagram"><div class="entity">STUDENT</div><div class="line"></div><div class="diamond"><span>ENROLLS</span></div><div class="line"></div><div class="entity">COURSE</div></div>
+<p class="muted small">Classic Chen notation: rectangles represent entities, diamonds represent relationships, and ovals (not shown here) represent attributes.</p>
+</section>
+
+<section class="panel">
+<h2>2. Types of attributes</h2>
+<table><thead><tr><th>Type</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+<tr><td>Simple / atomic</td><td>Cannot be meaningfully split into smaller parts</td><td>Age</td></tr>
+<tr><td>Composite</td><td>Can be split into components</td><td>Address → Street, City, PIN</td></tr>
+<tr><td>Single-valued</td><td>One value per entity</td><td>DateOfBirth</td></tr>
+<tr><td>Multivalued</td><td>May contain multiple values</td><td>PhoneNumbers</td></tr>
+<tr><td>Derived</td><td>Calculated from another attribute</td><td>Age from DateOfBirth</td></tr>
+<tr><td>Key attribute</td><td>Uniquely identifies an entity</td><td>StudentID</td></tr>
+</tbody></table>
+<p><b>Notation reminder:</b> key attribute is underlined; multivalued attribute uses a double oval; derived attribute uses a dashed oval in classic ER diagrams.</p>
+</section>
+
+<section class="panel">
+<h2>3. Cardinality ratio — interact with the example</h2>
+<p>Cardinality tells us the <b>maximum number</b> of entities that can be associated through a relationship.</p>
+<div class="grid">
+<div><label for="studentSide">How many courses can one student take?</label><select id="studentSide"><option value="one">At most one</option><option value="many" selected>Many</option></select></div>
+<div><label for="courseSide">How many students can take one course?</label><select id="courseSide"><option value="one">At most one</option><option value="many" selected>Many</option></select></div>
+</div>
+<button onclick="classify()">Classify relationship</button>
+<div id="cardinalityResult" class="result" aria-live="polite">Many students can take many courses: <b>M:N (many-to-many)</b>.</div>
+<table><thead><tr><th>Ratio</th><th>Meaning</th><th>Example</th></tr></thead><tbody>
+<tr><td>1:1</td><td>One on each side</td><td>Person — Passport (simplified rule)</td></tr>
+<tr><td>1:N</td><td>One A can relate to many B; each B relates to at most one A</td><td>Department — Employees</td></tr>
+<tr><td>N:1</td><td>Many A relate to one B</td><td>Many employees — one department</td></tr>
+<tr><td>M:N</td><td>Many on both sides</td><td>Students — Courses</td></tr>
+</tbody></table>
+</section>
+
+<section class="panel">
+<h2>4. Participation constraints</h2>
+<p>Participation tells us whether involvement in a relationship is <b>mandatory</b> or <b>optional</b>.</p>
+<div class="grid">
+<div><h3>Total participation</h3><p>Every entity in that entity set must participate in the relationship.</p><p><b>Example:</b> Every dependent must be associated with an employee.</p><span class="pill">Double line in classic ER notation</span></div>
+<div><h3>Partial participation</h3><p>Some entities may not participate.</p><p><b>Example:</b> An employee may not manage any project.</p><span class="pill">Single line in classic ER notation</span></div>
+</div>
+<p><b>Remember:</b> cardinality = “how many?”; participation = “must it happen?” They are different constraints.</p>
+</section>
+
+<section class="panel">
+<h2>5. Weak entities and identifying relationships</h2>
+<p>A <b>weak entity</b> cannot be uniquely identified using its own attributes alone. It depends on an owner (strong) entity and typically uses a <b>partial key</b> together with the owner's key.</p>
+<div class="diagram"><div class="entity">EMPLOYEE<br><small>(EmployeeID)</small></div><div class="line"></div><div class="diamond"><span>HAS</span></div><div class="line"></div><div class="entity" style="border-style:double;border-width:4px">DEPENDENT<br><small>(Name)</small></div></div>
+<p>For example, a dependent's name may be unique only within one employee's family. The key can be <code>(EmployeeID, DependentName)</code>. The identifying relationship and weak entity are drawn with double diamonds and double rectangles in classic notation.</p>
+</section>
+
+<section class="panel">
+<h2>6. Map an ER model to relational tables</h2>
+<p>Try selecting a relationship type and see a common mapping rule.</p>
+<label for="mapping">Relationship type</label>
+<select id="mapping" onchange="showMapping()">
+<option value="1n">One-to-many (1:N)</option>
+<option value="mn">Many-to-many (M:N)</option>
+<option value="one">One-to-one (1:1)</option>
+<option value="weak">Weak entity</option>
+</select>
+<div id="mappingResult" class="result"></div>
+<h3>Example schema: students enroll in courses (M:N)</h3>
+<div class="code">STUDENT(StudentID PRIMARY KEY, Name)
+COURSE(CourseID PRIMARY KEY, Title)
+ENROLLMENT(
+  StudentID REFERENCES STUDENT(StudentID),
+  CourseID REFERENCES COURSE(CourseID),
+  EnrolledOn,
+  PRIMARY KEY (StudentID, CourseID)
+)</div>
+<p class="muted small">The relationship table stores the two foreign keys; together they form a composite primary key when a student can enroll in a course only once.</p>
+</section>
+
+<section class="panel">
+<h2>7. Quick practice</h2>
+<div class="quiz-q"><b>Q1.</b> In an ER diagram, which shape usually represents an entity?<br>
+<label><input type="radio" name="q1" value="a"> Diamond</label><label><input type="radio" name="q1" value="b"> Rectangle</label><label><input type="radio" name="q1" value="c"> Dashed oval</label></div>
+<div class="quiz-q"><b>Q2.</b> A student can take many courses and a course can have many students. What is the cardinality?<br>
+<label><input type="radio" name="q2" value="a"> 1:1</label><label><input type="radio" name="q2" value="b"> 1:N</label><label><input type="radio" name="q2" value="c"> M:N</label></div>
+<div class="quiz-q"><b>Q3.</b> Every dependent must belong to an employee. What kind of participation does DEPENDENT have in HAS?<br>
+<label><input type="radio" name="q3" value="a"> Partial</label><label><input type="radio" name="q3" value="b"> Total</label></div>
+<div class="quiz-q"><b>Q4.</b> Which is a suitable key for DEPENDENT if DependentName is unique only within one employee's family?<br>
+<label><input type="radio" name="q4" value="a"> DependentName alone</label><label><input type="radio" name="q4" value="b"> EmployeeID alone</label><label><input type="radio" name="q4" value="c"> (EmployeeID, DependentName)</label></div>
+<button onclick="checkQuiz()">Check answers</button> <button class="secondary" onclick="resetQuiz()">Reset</button>
+<div id="quizResult" class="result" aria-live="polite">Choose your answers, then check them.</div>
+</section>
+<section class="panel">
+<h2>Topic recap</h2>
+<ul><li><b>Entity</b> = thing; <b>attribute</b> = property; <b>relationship</b> = association.</li><li><b>Cardinality</b> describes maximum relationship counts (1:1, 1:N, M:N).</li><li><b>Participation</b> is total (mandatory) or partial (optional).</li><li>A <b>weak entity</b> relies on an owner entity for identification.</li><li>When mapping M:N, create a separate relationship table with foreign keys.</li></ul>
+</section>
+</main>
+<script>
+function classify(){
+ const a=document.getElementById('studentSide').value;
+ const b=document.getElementById('courseSide').value;
+ let ratio=(a==='one'?(b==='one'?'1:1':'N:1'):(b==='one'?'1:N':'M:N'));
+ const meaning={'1:1':'One student ↔ at most one course, and one course ↔ at most one student.','1:N':'One student ↔ many courses, but each course ↔ at most one student.','N:1':'Each student ↔ at most one course, while one course ↔ many students.','M:N':'Many students can take many courses.'};
+ document.getElementById('cardinalityResult').innerHTML='<b>'+ratio+' relationship</b><br>'+meaning[ratio];
+}
+function showMapping(){
+ const v=document.getElementById('mapping').value;
+ const m={
+ '1n':'Put the primary key from the “one” side as a foreign key in the table on the “many” side. Example: EMPLOYEE(EmployeeID, DeptID), where DeptID references DEPARTMENT.',
+ 'mn':'Create a new relationship table containing foreign keys to both entities. Often, their combination is the composite primary key. Example: ENROLLMENT(StudentID, CourseID).',
+ 'one':'Place a foreign key in one of the tables, preferably on the side with total participation; add UNIQUE to enforce at most one match. Either table can be chosen depending on requirements.',
+ 'weak':'Create a table for the weak entity. Include the owner primary key as a foreign key and combine it with the weak entity partial key for the primary key. Example: DEPENDENT(EmployeeID, DependentName, PRIMARY KEY(EmployeeID, DependentName)).'
+ };
+ document.getElementById('mappingResult').textContent=m[v];
+}
+function checkQuiz(){
+ const answers={q1:'b',q2:'c',q3:'b',q4:'c'};
+ let score=0, out=[];
+ Object.keys(answers).forEach((q,i)=>{const el=document.querySelector('input[name="'+q+'"]:checked');if(el&&el.value===answers[q])score++;out.push('Q'+(i+1)+': '+(el&&el.value===answers[q]?'Correct':'Incorrect'));});
+ document.getElementById('quizResult').innerHTML='<b>Score: '+score+'/4</b><br>'+out.join('<br>');
+}
+function resetQuiz(){document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);document.getElementById('quizResult').textContent='Choose your answers, then check them.';}
+showMapping();
+</script>
+</body>
+</html>

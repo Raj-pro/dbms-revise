@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Topic 12 — Functional Dependency Simulator</title>
+<style>
+:root{--ink:#172033;--muted:#5d687c;--line:#dce3ee;--bg:#f4f7fb;--card:#fff;--blue:#275dad;--blue2:#eaf2ff;--green:#16794a;--greenbg:#e8f7ef;--red:#b83232;--redbg:#fff0f0;--gold:#9a6500;--goldbg:#fff6dc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:1050px;margin:auto;padding:24px 16px 48px}header{background:linear-gradient(135deg,#183d78,#3475cb);color:#fff;padding:26px;border-radius:18px;margin-bottom:18px}h1{font-size:clamp(1.65rem,4vw,2.5rem);line-height:1.15;margin:0 0 8px}header p{margin:0;color:#e9f1ff}.pill{display:inline-block;background:#ffffff22;border:1px solid #ffffff55;border-radius:99px;padding:4px 10px;font-size:.82rem;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}.card{background:var(--card);border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:16px;box-shadow:0 5px 18px #17345c08}h2{font-size:1.25rem;margin:0 0 12px}h3{font-size:1rem;margin:0 0 8px}.muted{color:var(--muted)}.formula{background:var(--blue2);border:1px solid #c8dcff;border-radius:12px;padding:13px;text-align:center;font-size:1.25rem;font-weight:750;margin:12px 0}.tag{display:inline-block;border-radius:7px;padding:3px 8px;font-size:.82rem;font-weight:700}.yes{background:var(--greenbg);color:var(--green)}.no{background:var(--redbg);color:var(--red)}.maybe{background:var(--goldbg);color:var(--gold)}table{width:100%;border-collapse:collapse;margin:10px 0;font-size:.94rem}th,td{padding:10px;border:1px solid var(--line);text-align:left}th{background:#f0f4fa}button,select{font:inherit;border-radius:9px;border:1px solid #b9c7dc;padding:9px 12px;background:#fff;color:var(--ink)}button{cursor:pointer;font-weight:650}button.primary{background:var(--blue);color:white;border-color:var(--blue)}button:hover{filter:brightness(.97)}.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:12px 0}.result{padding:12px;border-radius:10px;background:#f2f5fa;margin-top:12px;min-height:48px}.step{border-left:4px solid var(--blue);padding:9px 12px;margin:10px 0;background:#f7faff;border-radius:0 8px 8px 0}.question{padding:13px;border:1px solid var(--line);border-radius:10px;margin:12px 0}.options{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}.options button{font-weight:500}.small{font-size:.9rem}.footer{color:var(--muted);font-size:.9rem;text-align:center;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<span class="pill">DBMS • Topic 12 of your sequence</span>
+<h1>Functional Dependency (FD)</h1>
+<p>Learn how one attribute or group of attributes determines another—with examples you can test.</p>
+</header>
+
+<section class="card">
+<h2>1. The basic idea</h2>
+<p>A <b>functional dependency</b> describes a rule between columns in a table. If <b>X → Y</b>, then whenever two rows have the same value of X, they must also have the same value of Y.</p>
+<div class="formula">X → Y</div>
+<p><b>X</b> is the determinant (the column(s) doing the determining). <b>Y</b> is the dependent attribute (the column(s) being determined).</p>
+<div class="step"><b>Example:</b> StudentID → StudentName. If StudentID is the same in two rows, StudentName must be the same too.</div>
+<p class="muted small">Important: an FD is a rule expected to hold for every valid state of the database—not merely a coincidence in a small sample.</p>
+</section>
+
+<div class="grid">
+<section class="card">
+<h2>2. Trivial FD</h2>
+<p>An FD <b>X → Y</b> is trivial when every attribute on the right is already included on the left: <b>Y ⊆ X</b>.</p>
+<div class="formula">{A, B} → A</div>
+<span class="tag yes">Always follows from set inclusion</span>
+<p>Example: {StudentID, CourseID} → StudentID. StudentID is already part of the left side.</p>
+</section>
+<section class="card">
+<h2>3. Non-trivial FD</h2>
+<p>An FD is non-trivial when the right side contains at least one attribute not present on the left: <b>Y ⊄ X</b>.</p>
+<div class="formula">StudentID → StudentName</div>
+<span class="tag no">Right side adds new information</span>
+<p>Example: StudentID → Department, assuming each student has one department in this database.</p>
+</section>
+<section class="card">
+<h2>4. Semi-non-trivial FD</h2>
+<p>Often called <b>partially non-trivial</b>: the right side shares some attributes with the left, but also includes at least one new attribute.</p>
+<div class="formula">{A, B} → {A, C}</div>
+<span class="tag maybe">Some overlap, some new</span>
+<p>A is already on the left; C is new. So this FD is non-trivial overall, and more specifically partially non-trivial.</p>
+</section>
+</div>
+
+<section class="card">
+<h2>5. Interactive FD classifier</h2>
+<p>Choose the attributes on each side. The simulator checks whether the FD is trivial, non-trivial, or partially non-trivial.</p>
+<div class="grid">
+<div>
+<label for="lhs"><b>Left side (X)</b></label><br>
+<select id="lhs" multiple size="5" style="width:100%;margin-top:6px">
+<option selected value="A">A</option><option selected value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+</select>
+<p class="muted small">Use Ctrl (Windows) or Cmd (Mac) to select multiple attributes.</p>
+</div>
+<div>
+<label for="rhs"><b>Right side (Y)</b></label><br>
+<select id="rhs" multiple size="5" style="width:100%;margin-top:6px">
+<option selected value="A">A</option><option value="B">B</option><option selected value="C">C</option><option value="D">D</option><option value="E">E</option>
+</select>
+<p class="muted small">Choose one or more attributes on the right.</p>
+</div>
+</div>
+<div class="controls"><button class="primary" onclick="classify()">Classify FD</button><button onclick="preset('trivial')">Try trivial</button><button onclick="preset('nontrivial')">Try non-trivial</button><button onclick="preset('partial')">Try partially non-trivial</button></div>
+<div id="classification" class="result" aria-live="polite">Select attributes and click “Classify FD”.</div>
+</section>
+
+<section class="card">
+<h2>6. See an FD in a table</h2>
+<p>Here, the same StudentID always has the same StudentName. That supports <b>StudentID → StudentName</b> for this sample.</p>
+<table>
+<thead><tr><th>StudentID</th><th>StudentName</th><th>Department</th></tr></thead>
+<tbody id="studentRows">
+<tr><td>S01</td><td>Asha</td><td>CSE</td></tr>
+<tr><td>S02</td><td>Ravi</td><td>ECE</td></tr>
+<tr><td>S03</td><td>Mina</td><td>CSE</td></tr>
+</tbody></table>
+<div class="controls"><button class="primary" onclick="addValid()">Add a valid row</button><button onclick="addViolation()">Add a conflicting row</button><button onclick="resetRows()">Reset table</button></div>
+<div id="tableResult" class="result" aria-live="polite">Try adding a row. A repeated StudentID with a different name violates the FD.</div>
+</section>
+
+<section class="card">
+<h2>7. Quick practice</h2>
+<div class="question">
+<p><b>Q1.</b> Is {A, B} → B trivial?</p>
+<div class="options"><button onclick="answer(1,'yes')">Yes</button><button onclick="answer(1,'no')">No</button></div>
+<div id="q1" class="result" hidden></div>
+</div>
+<div class="question">
+<p><b>Q2.</b> Is StudentID → StudentName non-trivial, assuming StudentName is not StudentID?</p>
+<div class="options"><button onclick="answer(2,'yes')">Yes</button><button onclick="answer(2,'no')">No</button></div>
+<div id="q2" class="result" hidden></div>
+</div>
+<div class="question">
+<p><b>Q3.</b> In {A, B} → {A, C}, which best describes the FD?</p>
+<div class="options"><button onclick="answer(3,'trivial')">Trivial</button><button onclick="answer(3,'nontrivial')">Non-trivial only</button><button onclick="answer(3,'partial')">Partially non-trivial</button></div>
+<div id="q3" class="result" hidden></div>
+</div>
+</section>
+<section class="card">
+<h2>8. Remember this</h2>
+<ul>
+<li><b>X → Y:</b> same X value means same Y value in every valid instance.</li>
+<li><b>Trivial:</b> all of Y is already contained in X.</li>
+<li><b>Non-trivial:</b> at least one attribute of Y is not in X.</li>
+<li><b>Partially non-trivial:</b> Y overlaps with X but also has a new attribute.</li>
+</ul>
+<p><b>Next topic:</b> Armstrong’s Axioms and Rules — Reflexivity, Union, Transitivity, Decomposition, Augmentation, and Pseudotransitivity.</p>
+</section>
+<div class="footer">Interactive DBMS learning file • Works offline in your browser</div>
+</div>
+<script>
+function chosen(id){return [...document.getElementById(id).selectedOptions].map(o=>o.value)}
+function classify(){
+ const x=chosen('lhs'), y=chosen('rhs'), out=document.getElementById('classification');
+ if(!x.length||!y.length){out.textContent='Choose at least one attribute on both sides.';return}
+ const xs=new Set(x), overlap=y.filter(a=>xs.has(a)), fresh=y.filter(a=>!xs.has(a));
+ let label,desc,cls;
+ if(!fresh.length){label='Trivial FD';desc='Every right-side attribute is already on the left (Y ⊆ X).';cls='yes'}
+ else if(overlap.length){label='Partially non-trivial FD';desc='The right side contains both an overlapping attribute ('+overlap.join(', ')+') and new attribute(s) ('+fresh.join(', ')+').';cls='maybe'}
+ else{label='Non-trivial FD';desc='At least one right-side attribute is not on the left, and there is no overlap in this example.';cls='no'}
+ out.innerHTML='<span class="tag '+cls+'">'+label+'</span><p><b>'+x.join(', ')+' → '+y.join(', ')+'</b></p>'+desc;
+}
+function preset(p){
+ const left=document.getElementById('lhs'),right=document.getElementById('rhs');
+ [...left.options,...right.options].forEach(o=>o.selected=false);
+ const set=(el,vals)=>[...el.options].forEach(o=>o.selected=vals.includes(o.value));
+ if(p==='trivial'){set(left,['A','B']);set(right,['B'])}
+ if(p==='nontrivial'){set(left,['A']);set(right,['C'])}
+ if(p==='partial'){set(left,['A','B']);set(right,['A','C'])}
+ classify();
+}
+let rowCount=4;
+function checkRows(){
+ const rows=[...document.querySelectorAll('#studentRows tr')], seen=new Map(), conflicts=[];
+ rows.forEach((r,i)=>{const id=r.cells[0].textContent,name=r.cells[1].textContent;if(seen.has(id)&&seen.get(id)!==name)conflicts.push('Row '+(i+1)+' has '+id+' → '+name+', but the same ID previously mapped to '+seen.get(id)+'.');else if(!seen.has(id))seen.set(id,name)});
+ const out=document.getElementById('tableResult');
+ if(conflicts.length){out.innerHTML='<span class="tag no">FD violated</span><p>'+conflicts.join('<br>')+'</p>'}
+ else out.innerHTML='<span class="tag yes">No violation in current rows</span><p>Every repeated StudentID maps to the same StudentName. This sample is consistent with the FD, though a sample alone cannot prove a permanent business rule.</p>';
+}
+function addValid(){const body=document.getElementById('studentRows');const tr=document.createElement('tr');tr.innerHTML='<td>S0'+rowCount+'</td><td>Student '+rowCount+'</td><td>CSE</td>';body.appendChild(tr);rowCount++;checkRows()}
+function addViolation(){const body=document.getElementById('studentRows');const tr=document.createElement('tr');tr.innerHTML='<td>S01</td><td>Different Name</td><td>CSE</td>';body.appendChild(tr);checkRows()}
+function resetRows(){document.getElementById('studentRows').innerHTML='<tr><td>S01</td><td>Asha</td><td>CSE</td></tr><tr><td>S02</td><td>Ravi</td><td>ECE</td></tr><tr><td>S03</td><td>Mina</td><td>CSE</td></tr>';rowCount=4;document.getElementById('tableResult').textContent='Table reset. Try adding a valid or conflicting row.'}
+function answer(n,val){
+ const out=document.getElementById('q'+n);out.hidden=false;
+ const correct={1:'yes',2:'yes',3:'partial'}[n];
+ if(val===correct){out.innerHTML='<span class="tag yes">Correct!</span> '+({1:'B is already part of {A, B}, so the FD is trivial.',2:'StudentName is not contained in StudentID, so the FD is non-trivial.',3:'A overlaps, while C is new. This is partially non-trivial.'}[n])}
+ else out.innerHTML='<span class="tag no">Not quite.</span> '+({1:'Trivial means the right side is a subset of the left side.',2:'The right side adds an attribute not on the left, so it is non-trivial.',3:'The right side contains A (overlap) and C (new), making it partially non-trivial.'}[n]);
+}
+classify();
+</script>
+</body>
+</html>

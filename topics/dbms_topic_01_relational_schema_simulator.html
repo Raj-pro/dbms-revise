@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DBMS Simulator 01 — Relational Schema</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#5c667a;--blue:#2563eb;--blue2:#dbeafe;--green:#15803d;--green2:#dcfce7;--orange:#c2410c;--orange2:#ffedd5;--line:#d7deea}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+header{background:linear-gradient(120deg,#172554,#1d4ed8);color:#fff;padding:28px 18px}
+.wrap{max-width:1050px;margin:auto;padding:0 16px}header h1{margin:0 0 6px;font-size:clamp(1.5rem,4vw,2.2rem)}header p{margin:0;color:#dbeafe}
+main{padding:22px 0 45px}.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;margin:0 0 16px;box-shadow:0 5px 18px #1725540a}
+h2{font-size:1.25rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 8px}.muted{color:var(--muted)}.pill{display:inline-block;padding:3px 9px;border-radius:99px;background:var(--blue2);color:#1d4ed8;font-size:.8rem;font-weight:700}
+.definition{font-size:1.05rem}.definition strong{color:var(--blue)}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}button,select,input{font:inherit}button{border:0;border-radius:9px;padding:10px 14px;background:var(--blue);color:#fff;font-weight:650;cursor:pointer}button.secondary{background:#e8edf5;color:#253047}button:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+.schema{display:flex;align-items:stretch;gap:15px;flex-wrap:wrap;margin-top:16px}.entity{flex:1;min-width:245px;border:2px solid #93c5fd;border-radius:12px;overflow:hidden;transition:.3s}.entity.highlight{border-color:var(--green);box-shadow:0 0 0 4px #bbf7d0;transform:translateY(-2px)}.entity-title{background:#dbeafe;padding:10px 13px;font-weight:800}.entity ul{list-style:none;padding:8px 13px;margin:0}.entity li{padding:6px 2px;border-bottom:1px solid #edf0f5}.entity li:last-child{border:0}.key{font-size:.72rem;border-radius:5px;padding:2px 5px;margin-right:6px;font-weight:800}.pk{background:#fef3c7;color:#92400e}.fk{background:#dcfce7;color:#166534}.arrow{align-self:center;font-size:1.7rem;color:var(--blue);font-weight:800}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.step{padding:12px;border:1px solid var(--line);border-radius:10px;background:#fbfcff}.step b{display:block;color:var(--blue);margin-bottom:4px}
+table{border-collapse:collapse;width:100%;margin:10px 0;font-size:.94rem}th,td{padding:9px 10px;border:1px solid var(--line);text-align:left}th{background:#edf4ff}.sample-row{transition:background .3s}.sample-row.active{background:#dcfce7}
+.question{border:1px solid var(--line);border-radius:10px;padding:13px;margin:10px 0}.options{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.options button{background:#e8edf5;color:#243047}.options button.chosen{background:var(--blue);color:white}.feedback{margin-top:9px;font-weight:700;min-height:25px}.good{color:var(--green)}.bad{color:var(--orange)}
+.note{background:#fff7ed;border-left:4px solid #fb923c;padding:12px 14px;border-radius:7px}.footer{text-align:center;color:var(--muted);font-size:.85rem;margin-top:18px}
+@media(max-width:650px){.steps{grid-template-columns:1fr}.arrow{transform:rotate(90deg);margin:auto}.panel{padding:15px}.schema{gap:8px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><span class="pill">DBMS • Topic 01</span><h1>Relational Schema — Interactive Simulator</h1><p>Understand how a database table is designed before storing its rows.</p></div></header>
+<main class="wrap">
+<section class="panel">
+<h2>1. The idea in simple words</h2>
+<p class="definition">A <strong>relational schema</strong> is the <strong>blueprint of a table</strong>. It tells us the table's name and the attributes (columns) it contains. The actual data rows are called the table's <strong>instance</strong> or contents.</p>
+<div class="steps">
+<div class="step"><b>Schema = Design</b><code>STUDENT(StudentID, Name, Department)</code></div>
+<div class="step"><b>Attributes = Columns</b><p class="muted">StudentID, Name, Department</p></div>
+<div class="step"><b>Instance = Data</b><p class="muted">The actual students stored in the table.</p></div>
+</div>
+</section>
+<section class="panel">
+<h2>2. Watch the schema become a table</h2>
+<p class="muted">Press each step. Notice that the schema defines the columns; records are added separately.</p>
+<div class="controls">
+<button id="step1">Step 1: Show schema</button><button id="step2" class="secondary">Step 2: Show columns</button><button id="step3" class="secondary">Step 3: Add records</button><button id="reset" class="secondary">Reset</button>
+</div>
+<div id="status" aria-live="polite"><b>Start here:</b> select Step 1 to view the table blueprint.</div>
+<div class="schema">
+<div class="entity" id="student">
+<div class="entity-title">STUDENT</div>
+<ul id="attributes"><li>StudentID</li><li>Name</li><li>Department</li></ul>
+</div>
+<div class="arrow" id="arrow" style="display:none">→</div>
+<div class="entity" id="instance" style="display:none;min-width:280px">
+<div class="entity-title">STUDENT — example instance</div>
+<div style="padding:0 12px 10px"><table><thead><tr><th>StudentID</th><th>Name</th><th>Department</th></tr></thead><tbody id="rows"><tr class="sample-row"><td>101</td><td>Asha</td><td>CSE</td></tr><tr class="sample-row"><td>102</td><td>Ravi</td><td>ECE</td></tr></tbody></table></div>
+</div>
+</div>
+</section>
+<section class="panel">
+<h2>3. Try changing the schema</h2>
+<p class="muted">Add a column and see how the blueprint changes. This is a learning demo; it does not connect to a real database.</p>
+<div class="controls"><input id="newColumn" placeholder="e.g. Email" aria-label="New column name"><button id="addColumn">Add attribute</button><button id="removeColumn" class="secondary">Remove last added attribute</button></div>
+<p id="editStatus" aria-live="polite">Current schema: STUDENT(StudentID, Name, Department)</p>
+</section>
+<section class="panel">
+<h2>4. Quick check</h2>
+<div class="question"><b>Question 1:</b> Which one is a relational schema?<div class="options" id="q1"><button data-correct="false">Asha, CSE</button><button data-correct="true">STUDENT(StudentID, Name, Department)</button><button data-correct="false">Only the row with ID 101</button></div><div class="feedback" id="f1" aria-live="polite"></div></div>
+<div class="question"><b>Question 2:</b> What is the instance of a relation?<div class="options" id="q2"><button data-correct="false">The table's blueprint</button><button data-correct="true">The data currently stored in the table</button><button data-correct="false">The database software</button></div><div class="feedback" id="f2" aria-live="polite"></div></div>
+<div class="note"><b>Remember:</b> Schema describes the structure; instance describes the current data. The data can change many times while the schema stays the same.</div>
+</section>
+<p class="footer">DBMS learning series • Topic 01 of your ordered list • Next topic: Data Types</p>
+</main>
+<script>
+const student=document.getElementById('student'), instance=document.getElementById('instance'), arrow=document.getElementById('arrow'), statusBox=document.getElementById('status');
+const attributes=['StudentID','Name','Department']; const added=[];
+function renderAttrs(){const ul=document.getElementById('attributes');ul.innerHTML='';attributes.forEach((a,i)=>{const li=document.createElement('li');li.textContent=a;if(i===0){const k=document.createElement('span');k.className='key pk';k.textContent='PK';li.prepend(k)}ul.appendChild(li)});document.getElementById('editStatus').textContent='Current schema: STUDENT('+attributes.join(', ')+')'}
+function reset(){student.classList.remove('highlight');instance.classList.remove('highlight');instance.style.display='none';arrow.style.display='none';statusBox.innerHTML='<b>Start here:</b> select Step 1 to view the table blueprint.';document.querySelectorAll('.controls button').forEach(b=>b.classList.add('secondary'));document.getElementById('step1').classList.remove('secondary')}
+document.getElementById('step1').onclick=()=>{reset();student.classList.add('highlight');statusBox.innerHTML='<b>Step 1:</b> <code>STUDENT(StudentID, Name, Department)</code> is the schema. It lists the table name and its attributes, but not the actual student records.'};
+document.getElementById('step2').onclick=()=>{reset();student.classList.add('highlight');statusBox.innerHTML='<b>Step 2:</b> Each item inside the schema becomes a column. StudentID is marked PK (primary key) in this example because it uniquely identifies each student.';};
+document.getElementById('step3').onclick=()=>{reset();student.classList.add('highlight');instance.style.display='block';arrow.style.display='block';instance.classList.add('highlight');statusBox.innerHTML='<b>Step 3:</b> The rows are an instance of the schema. Asha and Ravi are data; StudentID, Name, and Department are the defined columns.';};
+document.getElementById('reset').onclick=reset;
+document.getElementById('addColumn').onclick=()=>{const input=document.getElementById('newColumn');let value=input.value.trim();if(!value){document.getElementById('editStatus').textContent='Type an attribute name first.';return}if(attributes.some(a=>a.toLowerCase()===value.toLowerCase())){document.getElementById('editStatus').textContent='That attribute already exists.';return}attributes.push(value);added.push(value);renderAttrs();input.value='';student.classList.add('highlight')};
+document.getElementById('removeColumn').onclick=()=>{if(!added.length){document.getElementById('editStatus').textContent='No added attributes to remove. Original columns are kept.';return}const last=added.pop();attributes.splice(attributes.indexOf(last),1);renderAttrs()};
+document.querySelectorAll('.options').forEach((group,idx)=>{group.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{group.querySelectorAll('button').forEach(b=>b.classList.remove('chosen'));btn.classList.add('chosen');const feedback=document.getElementById(idx===0?'f1':'f2');if(btn.dataset.correct==='true'){feedback.textContent='Correct!';feedback.className='feedback good'}else{feedback.textContent='Not quite — try again.';feedback.className='feedback bad'}})});
+</script>
+</body>
+</html>

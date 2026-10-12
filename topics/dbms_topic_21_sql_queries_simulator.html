@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DBMS Topic 21 — SQL Queries and Subqueries Simulator</title>
+<style>
+:root{--ink:#172238;--muted:#5d687c;--line:#dce4ef;--bg:#f4f7fb;--blue:#255ca9;--pale:#eaf2ff;--green:#147848;--greenbg:#e8f7ef;--red:#b32c35;--redbg:#fff0f0;--gold:#946200;--goldbg:#fff5dc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}.wrap{max-width:1100px;margin:auto;padding:22px 16px 48px}header{background:linear-gradient(130deg,#17386d,#3477c9);color:white;padding:26px;border-radius:18px;margin-bottom:18px}h1{font-size:clamp(1.6rem,4vw,2.4rem);line-height:1.15;margin:0 0 8px}header p{margin:0;color:#e7f0ff}.pill{display:inline-block;border:1px solid #ffffff66;background:#ffffff20;padding:4px 10px;border-radius:99px;font-size:.82rem;margin-bottom:12px}.card{background:white;border:1px solid var(--line);border-radius:15px;padding:19px;margin-bottom:16px;box-shadow:0 4px 18px #17345c08}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}h2{font-size:1.25rem;margin:0 0 10px}h3{font-size:1rem;margin:0 0 7px}.formula{background:var(--pale);border:1px solid #c9dcff;border-radius:10px;padding:12px;font-weight:750;margin:10px 0;overflow:auto}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#f1f4f8;padding:12px;border-radius:9px}.muted{color:var(--muted)}.tag{display:inline-block;border-radius:7px;padding:3px 8px;font-size:.82rem;font-weight:700}.yes{background:var(--greenbg);color:var(--green)}.no{background:var(--redbg);color:var(--red)}button,select,input{font:inherit;border:1px solid #bac7d8;border-radius:9px;padding:9px 11px;background:white;color:var(--ink)}button{cursor:pointer;font-weight:650}button.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.result{background:#f2f5fa;padding:12px;border-radius:10px;margin-top:10px;min-height:42px}.question{border:1px solid var(--line);border-radius:10px;padding:13px;margin:12px 0}.options{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}table{border-collapse:collapse;width:100%;margin:10px 0}th,td{border:1px solid var(--line);padding:9px;text-align:left}th{background:#eff4fa}.footer{text-align:center;color:var(--muted);font-size:.9rem;margin-top:20px}code{background:#eef2f8;padding:2px 5px;border-radius:4px}
+</style></head>
+<body><div class="wrap">
+<header><span class="pill">DBMS • Topic 21</span><h1>SQL Queries and Nested Queries</h1><p>Explore SQL clauses, subqueries, EXISTS, NOT EXISTS, and how SQL expresses data requests.</p></header>
+<section class="card"><h2>1. SQL query structure</h2><p>SQL is mainly declarative: you describe the result you want, and the database chooses an execution plan.</p><pre><code>SELECT Dept, COUNT(*) AS Total
+FROM STUDENT
+WHERE Year >= 2
+GROUP BY Dept
+HAVING COUNT(*) > 1
+ORDER BY Total DESC;</code></pre><table><thead><tr><th>Clause</th><th>Purpose</th></tr></thead><tbody><tr><td>SELECT</td><td>Choose output columns or expressions</td></tr><tr><td>FROM</td><td>Choose source tables</td></tr><tr><td>WHERE</td><td>Filter rows before grouping</td></tr><tr><td>GROUP BY</td><td>Group rows by values</td></tr><tr><td>HAVING</td><td>Filter groups after aggregation</td></tr><tr><td>ORDER BY</td><td>Sort the output</td></tr></tbody></table></section>
+<div class="grid">
+<section class="card"><h2>2. Nested query</h2><p>A query inside another query. It can return one value, a list of values, or a table depending on its form.</p><pre><code>SELECT Name
+FROM STUDENT
+WHERE Dept IN (
+  SELECT Dept
+  FROM DEPARTMENT
+  WHERE Campus = 'North'
+);</code></pre></section>
+<section class="card"><h2>3. EXISTS and NOT EXISTS</h2><p><b>EXISTS</b> is true if its subquery returns at least one row. <b>NOT EXISTS</b> is true if it returns no rows.</p><pre><code>SELECT s.Name
+FROM STUDENT s
+WHERE EXISTS (
+  SELECT 1 FROM ENROLLMENT e
+  WHERE e.StudentID = s.StudentID
+);</code></pre><p class="muted">These are often used for “has at least one” and “has none” queries.</p></section>
+<section class="card"><h2>4. Correlated subquery</h2><p>A correlated subquery refers to a column from the outer query. Conceptually, its condition depends on the current outer row.</p><pre><code>SELECT s.Name
+FROM STUDENT s
+WHERE EXISTS (
+  SELECT 1 FROM ENROLLMENT e
+  WHERE e.StudentID = s.StudentID
+);</code></pre><p>Here, <code>s.StudentID</code> comes from the outer query.</p></section>
+<section class="card"><h2>5. SQL and relational calculus</h2><p>Relational calculus describes the logical condition a result must satisfy. SQL often expresses similar requests using SELECT, WHERE, EXISTS, and other clauses.</p><div class="formula">Logic condition → SQL predicate</div><p>SQL is not simply identical to classical relational calculus: SQL supports bags (duplicates), NULL, aggregation, ordering, and other features.</p></section>
+</div>
+<section class="card"><h2>6. Interactive query playground</h2><p>Choose a task and see a matching SQL query and its result on a sample dataset.</p><table><thead><tr><th>StudentID</th><th>Name</th><th>Dept</th><th>Year</th></tr></thead><tbody><tr><td>S1</td><td>Asha</td><td>CSE</td><td>2</td></tr><tr><td>S2</td><td>Ravi</td><td>ECE</td><td>3</td></tr><tr><td>S3</td><td>Mina</td><td>CSE</td><td>3</td></tr><tr><td>S4</td><td>Arjun</td><td>IT</td><td>1</td></tr></tbody></table>
+<label for="task"><b>Choose a query task</b></label><select id="task" onchange="runTask()" style="width:100%;margin-top:6px"><option value="where">Find CSE students (WHERE)</option><option value="group">Count students per department (GROUP BY)</option><option value="having">Departments with more than one student (HAVING)</option><option value="exists">Students with an enrollment (EXISTS)</option><option value="notexists">Students without an enrollment (NOT EXISTS)</option><option value="nested">Students in departments with Year-3 students (IN subquery)</option></select><div id="sqlResult" class="result" aria-live="polite"></div></section>
+<section class="card"><h2>7. Practice questions</h2>
+<div class="question"><b>Q1.</b> Which clause filters individual rows before grouping?<div class="options"><button onclick="quiz(1,'a')">WHERE</button><button onclick="quiz(1,'b')">HAVING</button><button onclick="quiz(1,'c')">ORDER BY</button></div><div id="q1" class="result" hidden></div></div>
+<div class="question"><b>Q2.</b> Which clause filters groups after GROUP BY?<div class="options"><button onclick="quiz(2,'a')">FROM</button><button onclick="quiz(2,'b')">HAVING</button><button onclick="quiz(2,'c')">SELECT</button></div><div id="q2" class="result" hidden></div></div>
+<div class="question"><b>Q3.</b> EXISTS is true when the subquery…<div class="options"><button onclick="quiz(3,'a')">returns at least one row</button><button onclick="quiz(3,'b')">returns no rows</button><button onclick="quiz(3,'c')">always returns NULL</button></div><div id="q3" class="result" hidden></div></div>
+<div class="question"><b>Q4.</b> What makes a subquery correlated?<div class="options"><button onclick="quiz(4,'a')">It references a column from the outer query</button><button onclick="quiz(4,'b')">It contains ORDER BY</button><button onclick="quiz(4,'c')">It always returns multiple rows</button></div><div id="q4" class="result" hidden></div></div>
+</section>
+<section class="card"><h2>Exam reminder</h2><ul><li><b>WHERE:</b> filters rows.</li><li><b>HAVING:</b> filters groups.</li><li><b>IN:</b> checks membership in a set of values.</li><li><b>EXISTS:</b> checks whether at least one row exists.</li><li><b>NOT EXISTS:</b> checks whether no matching row exists.</li></ul><p><b>Next topic:</b> ER Model — entities, attributes, relationships, cardinality, participation, weak entities, and mapping ER diagrams to schemas.</p></section>
+<div class="footer">Interactive DBMS learning file • Works offline in your browser</div></div>
+<script>
+const data=[{id:'S1',name:'Asha',dept:'CSE',year:2,enrolled:true},{id:'S2',name:'Ravi',dept:'ECE',year:3,enrolled:false},{id:'S3',name:'Mina',dept:'CSE',year:3,enrolled:true},{id:'S4',name:'Arjun',dept:'IT',year:1,enrolled:false}];
+function runTask(){let t=document.getElementById('task').value,sql='',rows=[],out=document.getElementById('sqlResult');
+if(t==='where'){sql="SELECT Name FROM STUDENT WHERE Dept = 'CSE';";rows=data.filter(x=>x.dept==='CSE').map(x=>x.name)}
+if(t==='group'){sql='SELECT Dept, COUNT(*) AS Total FROM STUDENT GROUP BY Dept;';const m={};data.forEach(x=>m[x.dept]=(m[x.dept]||0)+1);rows=Object.entries(m).map(([d,c])=>d+': '+c)}
+if(t==='having'){sql='SELECT Dept FROM STUDENT GROUP BY Dept HAVING COUNT(*) > 1;';const m={};data.forEach(x=>m[x.dept]=(m[x.dept]||0)+1);rows=Object.entries(m).filter(([d,c])=>c>1).map(([d])=>d)}
+if(t==='exists'){sql='SELECT s.Name FROM STUDENT s WHERE EXISTS (SELECT 1 FROM ENROLLMENT e WHERE e.StudentID = s.StudentID);';rows=data.filter(x=>x.enrolled).map(x=>x.name)}
+if(t==='notexists'){sql='SELECT s.Name FROM STUDENT s WHERE NOT EXISTS (SELECT 1 FROM ENROLLMENT e WHERE e.StudentID = s.StudentID);';rows=data.filter(x=>!x.enrolled).map(x=>x.name)}
+if(t==='nested'){sql="SELECT Name FROM STUDENT WHERE Dept IN (SELECT Dept FROM STUDENT WHERE Year = 3);";const depts=new Set(data.filter(x=>x.year===3).map(x=>x.dept));rows=data.filter(x=>depts.has(x.dept)).map(x=>x.name)}
+out.innerHTML='<b>SQL:</b><pre><code>'+sql+'</code></pre><b>Sample result:</b><p>'+(rows.length?rows.join(', '):'No matching rows')+'</p><p class="muted">Illustrative dataset only; results reflect the rows shown above and the sample enrollment flags.</p>'}
+const ans={1:['a','WHERE filters rows before grouping.'],2:['b','HAVING filters groups after grouping.'],3:['a','EXISTS is true if the subquery returns at least one row.'],4:['a','A correlated subquery refers to a value from the outer query.']};
+function quiz(n,v){let a=ans[n],e=document.getElementById('q'+n);e.hidden=false;e.innerHTML=v===a[0]?'<span class="tag yes">Correct!</span> '+a[1]:'<span class="tag no">Not quite.</span> '+a[1]}
+runTask();
+</script></body></html>
